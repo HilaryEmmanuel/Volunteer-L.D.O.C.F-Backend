@@ -1,13 +1,13 @@
 import { Model, DataTypes } from "sequelize";
-import sequelize from "./sequelize";
+import sequelize from "../config/database";
 
 interface UserAttributes {
     id?: number,
     fullname: string,
     email: string,
     password: string,
-    refreshtoken: string,
-    expiryDate: Date,
+    refreshtoken?: string | null
+    expiryDate?: Date
     createdAt?: Date,
     updatedAt?: Date 
 }
@@ -17,10 +17,10 @@ class User extends Model<UserAttributes> implements UserAttributes{
     fullname!: string
     email!: string
     password!: string
-    refreshtoken!: string
+    refreshtoken!: string | null
     expiryDate!: Date
-    createdAt!: Date
-    updatedAt!: Date
+    createdAt?: Date | undefined;
+    updatedAt?: Date | undefined;
 }
 
 User.init({
@@ -38,22 +38,27 @@ User.init({
 
     email: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true,
+        validate: {
+            isEmail: true
+        }
     },
 
     password: {
-        type: DataTypes.BLOB,
+        type: DataTypes.STRING,
         allowNull: false
     },
 
     refreshtoken: {
         type: DataTypes.STRING,
-        allowNull: false
+        unique: true,
+        allowNull: true
     },
 
     expiryDate: {
         type: DataTypes.DATE,
-        allowNull: false
+        allowNull: true
     }
 }, {
     sequelize,
@@ -61,5 +66,6 @@ User.init({
     createdAt: true,
     updatedAt: true
 })
+
 
 export default User
